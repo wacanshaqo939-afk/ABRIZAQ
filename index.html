@@ -205,8 +205,53 @@
       });
     }
 
-    renderAll();
-  </script>
+    renderAll();const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/snhvq0yn415dme1oz9vs...";
 
-</body>
-</html>
+function sendToMake(payload) {
+  fetch(MAKE_WEBHOOK_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  }).catch(() => {});
+}
+
+const _origCreateStore = typeof createStore === "function" ? createStore : null;
+if (_origCreateStore) {
+  createStore = function (...args) {
+    const res = _origCreateStore.apply(this, args);
+    const s = Array.isArray(stores) && stores[stores.length - 1];
+    if (s) {
+      sendToMake({
+        type: "store",
+        id: s.id,
+        name: s.name,
+        category: s.category,
+        created_at: new Date().toISOString()
+      });
+    }
+    return res;
+  };
+}
+
+const _origAddProduct = typeof addProduct === "function" ? addProduct : null;
+if (_origAddProduct) {
+  addProduct = function (...args) {
+    const res = _origAddProduct.apply(this, args);
+    const sid = Number(document.getElementById("productStoreSelect")?.value);
+    const st = Array.isArray(stores) && stores.find(x => x.id === sid);
+    const pr = st && Array.isArray(st.products) && st.products[st.products.length - 1];
+    if (st && pr) {
+      sendToMake({
+        type: "product",
+        store_id: st.id,
+        store_name: st.name,
+        title: pr.title,
+        price: pr.price,
+        created_at: new Date().toISOString()
+      });
+    }
+    return res;
+  };
+}
+
+  </script>
