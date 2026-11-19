@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="so">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Al-Suuq — Suuqa Ganacsiga</title>
+  <style>
+    body { font-family: sans-serif; margin: 0; padding: 14px; background: #f1f5f9; color: #0f172a; }
+    .topbar { background: #ea580c; color: white; padding: 14px; border-radius: 10px; margin-bottom: 14px; }
+    .topbar h1 { margin: 0; font-size: 22px; }
+    .topbar p { margin: 4px 0 0; font-size: 13px; opacity: 0.95; }
+    .card { background: white; padding: 14px; border-radius: 10px; margin-bottom: 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+    h2 { margin-top: 0; font-size: 17px; }
+    input, select, button { width: 100%; padding: 10px; margin: 6px 0; border-radius: 7px; border: 1px solid #cbd5e1; box-sizing: border-box; font-size: 14px; }
+    button { background: #ea580c; color: white; border: none; font-weight: bold; cursor: pointer; }
+    .btn-sec { background: #1e293b; }
+    .stars { color: #f59e0b; font-size: 20px; cursor: pointer; }
+    .badge-free { background: #dcfce7; color: #166534; padding: 3px 8px; border-radius: 5px; font-size: 12px; }
+    .badge-paid { background: #fee2e2; color: #991b1b; padding: 3px 8px; border-radius: 5px; font-size: 12px; }
+    .store-box { border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-top: 10px; background: #fff; }
+    .product-item { background: #f8fafc; padding: 8px 10px; border-radius: 6px; margin-top: 6px; font-size: 13px; border-left: 3px solid #ea580c; }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <h1>Al-Suuq</h1>
+    <p>Suuq ganacsi oo ay dukaamadu ka furtaan ciwaanno (Dharka, Baabuurta, Alaabta Guud)</p>
+  </div>
+
+  <div class="card">
+    <h2>Fur Ciwaan Dukaan <span id="statusBadge" class="badge-free">Bilaash Hadda</span></h2>
+    <input type="text" id="storeName" placeholder="Magaca Dukaanka (tusaale: Al-Nuur Trading)">
+    <select id="storeCategory">
+      <option value="Dharka">Dharka (Clothing)</option>
+      <option value="Baabuurta">Baabuurta (Vehicles)</option>
+      <option value="Alaabta Guud">Alaabta Guud (General Goods)</option>
+    </select>
+    <button onclick="createStore()">Fur Ciwaanka</button>
+    <p id="message" style="font-weight: bold; margin: 6px 0 0;"></p>
+  </div>
+
+  <div class="card">
+    <h2>Soo Dhig Alaab Suuqa</h2>
+    <select id="productStoreSelect"></select>
+    <input type="text" id="productTitle" placeholder="Magaca Alaabta (tusaale: Toyota Corolla / Shaati)">
+    <input type="text" id="productPrice" placeholder="Qiimaha (tusaale: $25 ama $8,500)">
+    <button class="btn-sec" onclick="addProduct()">Ku Dar Alaabta</button>
+    <p id="productMsg" style="font-weight: bold; margin: 6px 0 0;"></p>
+  </div>
+
+  <div class="card">
+    <h2>Dukaamada & Alaabta Suuqa</h2>
+    <label for="filterCategory" style="font-size: 13px; font-weight: bold;">Kala saar qaybta:</label>
+    <select id="filterCategory" onchange="renderAll()">
+      <option value="ALL">Dhammaan Qaybaha</option>
+      <option value="Dharka">Dharka (Clothing)</option>
+      <option value="Baabuurta">Baabuurta (Vehicles)</option>
+      <option value="Alaabta Guud">Alaabta Guud (General Goods)</option>
+    </select>
+    <div id="storeList"></div>
+  </div>
+
+  <script>
+    let isPaidEnabled = false;
+
+    let stores = [
+      {
+        id: 1,
+        name: "Al-Fajr General & Auto",
+        category: "Baabuurta",
+        stars: [5, 5, 4],
+        products: [
+          { title: "Hilux Pick-up 2018", price: "$14,500" }
+        ]
+      }
+    ];
+
+    function updateBadge() {
+      const badge = document.getElementById("statusBadge");
+      if (isPaidEnabled) {
+        badge.textContent = "Lacag Ayaa Laga Rabaa";
+        badge.className = "badge-paid";
+      } else {
+        badge.textContent = "Bilaash Hadda";
+        badge.className = "badge-free";
+      }
+    }
+
+    function createStore() {
+      const name = document.getElementById("storeName").value.trim();
+      const category = document.getElementById("storeCategory").value;
+      const msg = document.getElementById("message");
+
+      if (!name) {
+        msg.style.color = "#b91c1c";
+        msg.textContent = "Fadlan qor magaca dukaanka!";
+        return;
+      }
+
+      if (isPaidEnabled) {
+        msg.style.color = "#b91c1c";
+        msg.textContent = "Furitaanka ciwaanku hadda waa lacag. Fadlan dhammaystir lacag bixinta.";
+        return;
+      }
+
+      stores.push({
+        id: Date.now(),
+        name,
+        category,
+        stars: [],
+        products: []
+      });
+
+      document.getElementById("storeName").value = "";
+      msg.style.color = "#15803d";
+      msg.textContent = "Guul! Ciwaankaaga Al-Suuq si bilaash ah ayaa loo furay.";
+      renderAll();
+    }
+
+    function addProduct() {
+      const storeId = Number(document.getElementById("productStoreSelect").value);
+      const title = document.getElementById("productTitle").value.trim();
+      const price = document.getElementById("productPrice").value.trim();
+      const msg = document.getElementById("productMsg");
+
+      if (!title || !price) {
+        msg.style.color = "#b91c1c";
+        msg.textContent = "Fadlan geli magaca alaabta iyo qiimaha!";
+        return;
+      }
+
+      const store = stores.find(s => s.id === storeId);
+      if (store) {
+        store.products.push({ title, price });
+        document.getElementById("productTitle").value = "";
+        document.getElementById("productPrice").value = "";
+        msg.style.color = "#15803d";
+        msg.textContent = "Alaabtii waa lagu daray dukaanka!";
+        renderAll();
+      }
+    }
+
+    function rateStore(storeId, starVal) {
+      const store = stores.find(s => s.id === storeId);
+      if (store) {
+        store.stars.push(starVal);
+        renderAll();
+      }
+    }
+
+    function renderStoreSelect() {
+      const select = document.getElementById("productStoreSelect");
+      select.innerHTML = "";
+      stores.forEach(s => {
+        const opt = document.createElement("option");
+        opt.value = s.id;
+        opt.textContent = `${s.name} (${s.category})`;
+        select.appendChild(opt);
+      });
+    }
+
+    function renderAll() {
+      updateBadge();
+      renderStoreSelect();
+
+      const filter = document.getElementById("filterCategory").value;
+      const list = document.getElementById("storeList");
+      list.innerHTML = "";
+
+      const filtered = filter === "ALL"
+        ? stores
+        : stores.filter(s => s.category === filter);
+
+      if (filtered.length === 0) {
+        list.innerHTML = "<p>Dukaan kuma jiro qaybtan weli.</p>";
+        return;
+      }
+
+      filtered.forEach(store => {
+        const avg = store.stars.length
+          ? (store.stars.reduce((a, b) => a + b, 0) / store.stars.length).toFixed(1)
+          : "0.0";
+
+        const productsHtml = store.products.length
+          ? store.products.map(p => `<div class="product-item"><strong>${p.title}</strong> — ${p.price}</div>`).join("")
+          : `<div style="font-size:12px; color:#64748b; margin-top:6px;">Alaab weli lama soo dhigin.</div>`;
+
+        const box = document.createElement("div");
+        box.className = "store-box";
+        box.innerHTML = `
+          <div><strong>${store.name}</strong> • <span style="color:#ea580c; font-weight:bold;">${store.category}</span></div>
+          <div style="font-size:13px; margin-top:4px;">Qiimaynta: ⭐ <strong>${avg}</strong> (${store.stars.length} qiimayn)</div>
+          <div class="stars" style="margin-top:4px;">
+            Qiimee:
+            <span onclick="rateStore(${store.id}, 1)">★</span>
+            <span onclick="rateStore(${store.id}, 2)">★</span>
+            <span onclick="rateStore(${store.id}, 3)">★</span>
+            <span onclick="rateStore(${store.id}, 4)">★</span>
+            <span onclick="rateStore(${store.id}, 5)">★</span>
+          </div>
+          ${productsHtml}
+        `;
+        list.appendChild(box);
+      });
+    }
+
+    renderAll();
+  </script>
+
+</body>
+</html>
