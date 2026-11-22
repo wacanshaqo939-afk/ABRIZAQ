@@ -8,10 +8,27 @@
     body { font-family: sans-serif; margin: 0; padding: 16px; background: #f1f5f9; color: #0f172a; }
     .topbar { background: #1d4ed8; color: #fff; padding: 14px; border-radius: 10px; margin-bottom: 14px; }
     .topbar h1 { margin: 0; font-size: 22px; }
-    .card { background: #fff; padding: 14px; border-radius: 10px; margin-bottom: 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+    .card { background: #fff; padding: 14px; border-radius: 10px; margin-bottom: 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
     input, button { width: 100%; padding: 10px; margin: 6px 0; border-radius: 7px; border: 1px solid #cbd5e1; box-sizing: border-box; }
     button { background: #2563eb; color: #fff; border: none; font-weight: bold; cursor: pointer; }
+    button.secondary { background: #0f172a; }
     #statusMsg { margin-top: 8px; font-weight: bold; font-size: 13px; }
+    .profile-header { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+    .shop-title { font-size: 20px; font-weight: bold; margin: 0; }
+    .blue-tick {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #1d9bf0;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: bold;
+    }
+    .meta-row { font-size: 14px; color: #334155; margin: 4px 0; }
+    .badge-unverified { font-size: 12px; color: #64748b; background: #e2e8f0; padding: 3px 8px; border-radius: 999px; }
   </style>
 </head>
 <body>
@@ -21,13 +38,116 @@
 
   <div class="card">
     <h2>Blue Verification (ABRIZAQ)</h2>
-    <input type="text" id="vendorName" placeholder="Magaca Dukaanka / Ganacsadaha (tabta Vendors)" />
+    <input type="text" id="vendorName" value="Amiin shop" placeholder="Magaca Dukaanka / Ganacsadaha (tabta Vendors)" />
     <button onclick="sendBlueVerification()">Blue Verify</button>
+    <button class="secondary" onclick="loadVendorProfile()">Eeg Profile-ka</button>
     <p id="statusMsg"></p>
   </div>
 
+  <div class="card" id="profileCard">
+    <div class="profile-header">
+      <h3 class="shop-title" id="profileShopName">Amiin shop</h3>
+      <span class="blue-tick" id="blueTickBadge" title="Verified Vendor" style="display: none;">✓</span>
+      <span class="badge-unverified" id="unverifiedBadge" style="display: none;">Aan la xaqiijin</span>
+    </div>
+    <p class="meta-row" id="profileVendorId">ID: —</p>
+    <p class="meta-row" id="profilePhone">Telefoon: —</p>
+    <p class="meta-row" id="profileStatus">Xaaladda Blue Tick: —</p>
+  </div>
+
   <script>
-    const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/dsz4f8zjco55vtcxrna7shipr6p1erog"; // Ku beddel Webhook URL-ka Make.com (3698015)
+    const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/dxz4f1rzcs5vtcsma7shirp6plerag";
+    const SHEET_ID = "1gVZGyN1Rm7I5_SB5WY3DBZFXRBkD8smy4m4RWUI8nkc";
+    const SHEET_NAME = "Vendors";
+
+    function parseCsvLine(line) {
+      const result = [];
+      let current = "";
+      let inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (ch === '"') {
+          inQuotes = !inQuotes;
+        } else if (ch === "," && !inQuotes) {
+          result.push(current.trim());
+          current = "";
+        } else {
+          current += ch;
+        }
+      }
+      result.push(current.trim());
+      return result;
+    }
+
+    async function loadVendorProfile(targetName) {
+      const nameInput = document.getElementById("vendorName");
+      const queryName = (targetName || nameInput.value || "Amiin shop").trim();
+      const shopNameEl = document.getElementById("profileShopName");
+      const blueTickEl = document.getElementById("blueTickBadge");
+      const unverifiedEl = document.getElementById("unverifiedBadge");
+      const idEl = document.getElementById("profileVendorId");
+      const phoneEl = document.getElementById("profilePhone");
+      const statusEl = document.getElementById("profileStatus");
+
+      shopNameEl.textContent = queryName;
+      blueTickEl.style.display = "none";
+      unverifiedEl.style.display = "none";
+      statusEl.textContent = "Xaaladda Blue Tick: Waa la soo akhrinayaa...";
+
+      try {
+        const csvUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}&t=${Date.now()}`;
+        const res = await fetch(csvUrl);
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const csvText = await res.text();
+        const lines = csvText.split(/\r?\n/).filter(l => l.trim().length > 0);
+        if (lines.length < 2) throw new Error("Xog lagama helin tab-ta Vendors");
+
+        const headers = parseCsvLine(lines[0]).map(h => h.replace(/^"+|"+$/g, "").replace(/,+$/, "").trim());
+        const shopIdx = headers.indexOf("shop_name");
+        const idIdx = headers.indexOf("vendor_id");
+        const phoneIdx = headers.indexOf("phone_number");
+        const blueIdx = headers.findIndex(h => h.startsWith("blue_verified"));
+
+        let matchedRow = null;
+        for (let i = 1; i < lines.length; i++) {
+          const cols = parseCsvLine(lines[i]).map(c => c.replace(/^"+|"+$/g, "").trim());
+          const rowShop = shopIdx >= 0 ? (cols[shopIdx] || "") : "";
+          if (rowShop.toLowerCase() === queryName.toLowerCase()) {
+            matchedRow = cols;
+            break;
+          }
+        }
+
+        if (!matchedRow) {
+          idEl.textContent = "ID: Lama helin";
+          phoneEl.textContent = "Telefoon: —";
+          unverifiedEl.style.display = "inline-block";
+          statusEl.textContent = "Xaaladda Blue Tick: Dukaaankan lagama helin tab-ta Vendors";
+          return;
+        }
+
+        const vendorId = idIdx >= 0 ? (matchedRow[idIdx] || "—") : "—";
+        const phone = phoneIdx >= 0 ? (matchedRow[phoneIdx] || "—") : "—";
+        const blueRaw = blueIdx >= 0 ? (matchedRow[blueIdx] || "").toUpperCase() : "";
+        const isBlueVerified = blueRaw === "TRUE";
+
+        shopNameEl.textContent = matchedRow[shopIdx] || queryName;
+        idEl.textContent = "ID: " + vendorId;
+        phoneEl.textContent = "Telefoon: " + phone;
+
+        if (isBlueVerified) {
+          blueTickEl.style.display = "inline-flex";
+          unverifiedEl.style.display = "none";
+          statusEl.textContent = "Xaaladda Blue Tick: TRUE (La xaqiijiyey)";
+        } else {
+          blueTickEl.style.display = "none";
+          unverifiedEl.style.display = "inline-block";
+          statusEl.textContent = "Xaaladda Blue Tick: FALSE";
+        }
+      } catch (err) {
+        statusEl.textContent = "Xaaladda Blue Tick: Lama soo akhrin karo (" + err.message + "). Hubi in Sheet-ku u furan yahay 'Anyone with the link can view'.";
+      }
+    }
 
     async function sendBlueVerification() {
       const nameInput = document.getElementById("vendorName");
@@ -59,6 +179,7 @@
 
         if (response.ok) {
           statusEl.textContent = "Blue Verification waa la diray (" + vendorName + ").";
+          setTimeout(() => loadVendorProfile(vendorName), 1800);
         } else {
           statusEl.textContent = "Khalad ayaa dhacay (" + response.status + ").";
         }
@@ -66,6 +187,8 @@
         statusEl.textContent = "Xiriirka ayaa go'ay: " + error.message;
       }
     }
+
+    window.addEventListener("DOMContentLoaded", () => loadVendorProfile("Amiin shop"));
   </script>
 </body>
 </html>
