@@ -3,18 +3,88 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ABRIZAQ</title>
+  <title>ABRIZAQ - Global Marketplace Verification</title>
   <style>
-    body { font-family: sans-serif; margin: 0; padding: 16px; background: #f1f5f9; color: #0f172a; }
-    .topbar { background: #1d4ed8; color: #fff; padding: 14px; border-radius: 10px; margin-bottom: 14px; }
-    .topbar h1 { margin: 0; font-size: 22px; }
-    .card { background: #fff; padding: 14px; border-radius: 10px; margin-bottom: 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
-    input, button { width: 100%; padding: 10px; margin: 6px 0; border-radius: 7px; border: 1px solid #cbd5e1; box-sizing: border-box; }
-    button { background: #2563eb; color: #fff; border: none; font-weight: bold; cursor: pointer; }
-    button.secondary { background: #0f172a; }
-    #statusMsg { margin-top: 8px; font-weight: bold; font-size: 13px; }
-    .profile-header { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
-    .shop-title { font-size: 20px; font-weight: bold; margin: 0; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f6ff;
+      margin: 0;
+      padding: 20px;
+      color: #0f172a;
+    }
+    .container {
+      max-width: 520px;
+      margin: 0 auto;
+    }
+    .header {
+      background: #1d4ed8;
+      color: #ffffff;
+      padding: 16px 20px;
+      border-radius: 10px;
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .support-tag {
+      font-size: 13px;
+      font-weight: normal;
+      background: rgba(255, 255, 255, 0.18);
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+    .card {
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(29, 78, 216, 0.08);
+      margin-bottom: 18px;
+      border: 1px solid #dbeafe;
+    }
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 11px 12px;
+      border: 1px solid #93c5fd;
+      border-radius: 8px;
+      font-size: 15px;
+      margin-bottom: 12px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+    .btn-primary {
+      background: #1d4ed8;
+      color: #ffffff;
+    }
+    .btn-dark {
+      background: #0f172a;
+      color: #ffffff;
+      margin-bottom: 0;
+    }
+    .vendor-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
     .blue-tick {
       display: inline-flex;
       align-items: center;
@@ -24,39 +94,56 @@
       border-radius: 50%;
       background: #1d9bf0;
       color: #ffffff;
-      font-size: 13px;
+      font-size: 14px;
       font-weight: bold;
     }
-    .meta-row { font-size: 14px; color: #334155; margin: 4px 0; }
-    .badge-unverified { font-size: 12px; color: #64748b; background: #e2e8f0; padding: 3px 8px; border-radius: 999px; }
+    .meta {
+      margin: 6px 0;
+      font-size: 14px;
+      color: #334155;
+    }
+    .status-verified {
+      color: #1d9bf0;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    .status-normal {
+      color: #475569;
+      margin-top: 10px;
+    }
+    .status-error {
+      color: #b91c1c;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
-  <div class="topbar">
-    <h1>ABRIZAQ</h1>
-  </div>
-
-  <div class="card">
-    <h2>Blue Verification (ABRIZAQ)</h2>
-    <input type="text" id="vendorName" value="Amiin shop" placeholder="Magaca Dukaanka / Ganacsadaha (tabta Vendors)" />
-    <button onclick="sendBlueVerification()">Blue Verify</button>
-    <button class="secondary" onclick="loadVendorProfile()">Eeg Profile-ka</button>
-    <p id="statusMsg"></p>
-  </div>
-
-  <div class="card" id="profileCard">
-    <div class="profile-header">
-      <h3 class="shop-title" id="profileShopName">Amiin shop</h3>
-      <span class="blue-tick" id="blueTickBadge" title="Verified Vendor" style="display: none;">✓</span>
-      <span class="badge-unverified" id="unverifiedBadge" style="display: none;">Aan la xaqiijin</span>
+  <div class="container">
+    <div class="header">
+      <span>ABRIZAQ</span>
+      <span class="support-tag">Support: 0610751559</span>
     </div>
-    <p class="meta-row" id="profileVendorId">ID: —</p>
-    <p class="meta-row" id="profilePhone">Telefoon: —</p>
-    <p class="meta-row" id="profileStatus">Xaaladda Blue Tick: —</p>
+
+    <div class="card">
+      <h2>Blue Verification (ABRIZAQ)</h2>
+      <label for="vendorName">Magaca Ganacsiga</label>
+      <input id="vendorName" type="text" value="Amiin shop" />
+      <button class="btn-primary" type="button" onclick="loadVendorProfile()">Blue Verify</button>
+      <button class="btn-dark" type="button" onclick="loadVendorProfile()">Eeg Profile-ka</button>
+    </div>
+
+    <div class="card" id="profileCard">
+      <div class="vendor-title">
+        <span id="displayName">Amiin shop</span>
+        <span id="blueTickBadge" class="blue-tick" style="display: none;">✓</span>
+      </div>
+      <div class="meta">ID: <span id="vendorId">–</span></div>
+      <div class="meta">Telefoon: <span id="vendorPhone">–</span></div>
+      <div id="tickStatus" class="status-normal">Waa la hubinayaa xogta...</div>
+    </div>
   </div>
 
   <script>
-    const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/dxz4f1rzcs5vtcsma7shirp6plerag";
     const SHEET_ID = "1gVZGyN1Rm7I5_SB5WY3DBZFXRBkD8smy4m4RWUI8nkc";
     const SHEET_NAME = "Vendors";
 
@@ -64,131 +151,161 @@
       const result = [];
       let current = "";
       let inQuotes = false;
+
       for (let i = 0; i < line.length; i++) {
-        const ch = line[i];
-        if (ch === '"') {
+        const char = line[i];
+        const nextChar = line[i + 1];
+
+        if (char === '"' && inQuotes && nextChar === '"') {
+          current += '"';
+          i++;
+        } else if (char === '"') {
           inQuotes = !inQuotes;
-        } else if (ch === "," && !inQuotes) {
+        } else if (char === "," && !inQuotes) {
           result.push(current.trim());
           current = "";
         } else {
-          current += ch;
+          current += char;
         }
       }
       result.push(current.trim());
       return result;
     }
 
-    async function loadVendorProfile(targetName) {
-      const nameInput = document.getElementById("vendorName");
-      const queryName = (targetName || nameInput.value || "Amiin shop").trim();
-      const shopNameEl = document.getElementById("profileShopName");
-      const blueTickEl = document.getElementById("blueTickBadge");
-      const unverifiedEl = document.getElementById("unverifiedBadge");
-      const idEl = document.getElementById("profileVendorId");
-      const phoneEl = document.getElementById("profilePhone");
-      const statusEl = document.getElementById("profileStatus");
+    function parseCsv(csvText) {
+      const lines = csvText
+        .split(/\r?\n/)
+        .map((l) => l.trim())
+        .filter((l) => l.length > 0);
 
-      shopNameEl.textContent = queryName;
-      blueTickEl.style.display = "none";
-      unverifiedEl.style.display = "none";
-      statusEl.textContent = "Xaaladda Blue Tick: Waa la soo akhrinayaa...";
+      if (lines.length < 2) return [];
 
-      try {
-        const csvUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}&t=${Date.now()}`;
-        const res = await fetch(csvUrl);
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        const csvText = await res.text();
-        const lines = csvText.split(/\r?\n/).filter(l => l.trim().length > 0);
-        if (lines.length < 2) throw new Error("Xog lagama helin tab-ta Vendors");
+      const headers = parseCsvLine(lines[0]).map((h) =>
+        h.replace(/^"+|"+$/g, "").trim().toLowerCase()
+      );
 
-        const headers = parseCsvLine(lines[0]).map(h => h.replace(/^"+|"+$/g, "").replace(/,+$/, "").trim());
-        const shopIdx = headers.indexOf("shop_name");
-        const idIdx = headers.indexOf("vendor_id");
-        const phoneIdx = headers.indexOf("phone_number");
-        const blueIdx = headers.findIndex(h => h.startsWith("blue_verified"));
-
-        let matchedRow = null;
-        for (let i = 1; i < lines.length; i++) {
-          const cols = parseCsvLine(lines[i]).map(c => c.replace(/^"+|"+$/g, "").trim());
-          const rowShop = shopIdx >= 0 ? (cols[shopIdx] || "") : "";
-          if (rowShop.toLowerCase() === queryName.toLowerCase()) {
-            matchedRow = cols;
-            break;
-          }
-        }
-
-        if (!matchedRow) {
-          idEl.textContent = "ID: Lama helin";
-          phoneEl.textContent = "Telefoon: —";
-          unverifiedEl.style.display = "inline-block";
-          statusEl.textContent = "Xaaladda Blue Tick: Dukaaankan lagama helin tab-ta Vendors";
-          return;
-        }
-
-        const vendorId = idIdx >= 0 ? (matchedRow[idIdx] || "—") : "—";
-        const phone = phoneIdx >= 0 ? (matchedRow[phoneIdx] || "—") : "—";
-        const blueRaw = blueIdx >= 0 ? (matchedRow[blueIdx] || "").toUpperCase() : "";
-        const isBlueVerified = blueRaw === "TRUE";
-
-        shopNameEl.textContent = matchedRow[shopIdx] || queryName;
-        idEl.textContent = "ID: " + vendorId;
-        phoneEl.textContent = "Telefoon: " + phone;
-
-        if (isBlueVerified) {
-          blueTickEl.style.display = "inline-flex";
-          unverifiedEl.style.display = "none";
-          statusEl.textContent = "Xaaladda Blue Tick: TRUE (La xaqiijiyey)";
-        } else {
-          blueTickEl.style.display = "none";
-          unverifiedEl.style.display = "inline-block";
-          statusEl.textContent = "Xaaladda Blue Tick: FALSE";
-        }
-      } catch (err) {
-        statusEl.textContent = "Xaaladda Blue Tick: Lama soo akhrin karo (" + err.message + "). Hubi in Sheet-ku u furan yahay 'Anyone with the link can view'.";
-      }
+      return lines.slice(1).map((line) => {
+        const values = parseCsvLine(line).map((v) => v.replace(/^"+|"+$/g, "").trim());
+        const row = {};
+        headers.forEach((header, idx) => {
+          row[header] = values[idx] !== undefined ? values[idx] : "";
+        });
+        return row;
+      });
     }
 
-    async function sendBlueVerification() {
-      const nameInput = document.getElementById("vendorName");
-      const statusEl = document.getElementById("statusMsg");
-      const vendorName = nameInput.value.trim();
+    function isTruthy(val) {
+      const normalized = String(val || "").trim().toLowerCase();
+      return normalized === "true" || normalized === "1" || normalized === "yes";
+    }
 
-      if (!vendorName) {
-        statusEl.textContent = "Fadlan qor magaca dukaanka / ganacsadaha.";
-        return;
+    async function fetchSheetRows() {
+      const urls = [
+        `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}&t=${Date.now()}`,
+        `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&t=${Date.now()}`
+      ];
+
+      let lastError = "HTTP 404";
+
+      for (const url of urls) {
+        try {
+          const res = await fetch(url, { cache: "no-store" });
+          if (!res.ok) {
+            lastError = `HTTP ${res.status}`;
+            continue;
+          }
+          const text = await res.text();
+          if (text.trim().startsWith("<!DOCTYPE html") || text.trim().startsWith("<html")) {
+            lastError = "Sheet-ku weli uma furna Public/Anyone with the link";
+            continue;
+          }
+          const rows = parseCsv(text);
+          if (rows.length > 0) {
+            return rows;
+          }
+        } catch (e) {
+          lastError = e.message;
+        }
       }
 
-      statusEl.textContent = "Waa la dirayaa codsiga Blue Verification...";
+      throw new Error(lastError);
+    }
+
+    async function loadVendorProfile() {
+      const inputVal = document.getElementById("vendorName").value.trim();
+      const displayNameEl = document.getElementById("displayName");
+      const badgeEl = document.getElementById("blueTickBadge");
+      const idEl = document.getElementById("vendorId");
+      const phoneEl = document.getElementById("vendorPhone");
+      const statusEl = document.getElementById("tickStatus");
+
+      const queryName = inputVal || "Amiin shop";
+      displayNameEl.textContent = queryName;
+      badgeEl.style.display = "none";
+      idEl.textContent = "–";
+      phoneEl.textContent = "–";
+      statusEl.className = "status-normal";
+      statusEl.textContent = "Waa la soo akhrinayaa xogta Vendors...";
 
       try {
-        const response = await fetch(MAKE_WEBHOOK_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            app: "ABRIZAQ",
-            scenario_id: 3698015,
-            database: "Abrisac_Database",
-            sheet: "Vendors",
-            column: "I",
-            field: "blue_verified",
-            vendor_name: vendorName,
-            blue_verified: true
-          })
+        const rows = await fetchSheetRows();
+
+        const matchedRow = rows.find((r) => {
+          const nameCandidates = [
+            r.vendor_name,
+            r.vendorname,
+            r.shop_name,
+            r.shopname,
+            r.name,
+            r.business_name
+          ]
+            .filter(Boolean)
+            .map((s) => s.toLowerCase());
+
+          return nameCandidates.includes(queryName.toLowerCase());
         });
 
-        if (response.ok) {
-          statusEl.textContent = "Blue Verification waa la diray (" + vendorName + ").";
-          setTimeout(() => loadVendorProfile(vendorName), 1800);
+        const targetRow =
+          matchedRow || rows.find((r) => isTruthy(r.blue_verified)) || rows[0];
+
+        const vendorTitle =
+          targetRow.vendor_name ||
+          targetRow.vendorname ||
+          targetRow.shop_name ||
+          targetRow.name ||
+          queryName;
+
+        const vendorId =
+          targetRow.vendor_id || targetRow.id || targetRow.uid || "–";
+
+        const vendorPhone =
+          targetRow.phone || targetRow.telefoon || targetRow.tel || "–";
+
+        const verified = isTruthy(targetRow.blue_verified);
+
+        displayNameEl.textContent = vendorTitle;
+        idEl.textContent = vendorId;
+        phoneEl.textContent = vendorPhone;
+
+        if (verified) {
+          badgeEl.style.display = "inline-flex";
+          statusEl.className = "status-verified";
+          statusEl.textContent = "Xaaladda Blue Tick: Waa la xaqiijiyey (TRUE)";
         } else {
-          statusEl.textContent = "Khalad ayaa dhacay (" + response.status + ").";
+          badgeEl.style.display = "none";
+          statusEl.className = "status-normal";
+          statusEl.textContent = "Xaaladda Blue Tick: Lama xaqiijin (FALSE)";
         }
-      } catch (error) {
-        statusEl.textContent = "Xiriirka ayaa go'ay: " + error.message;
+      } catch (err) {
+        badgeEl.style.display = "none";
+        statusEl.className = "status-error";
+        statusEl.textContent = `Xaaladda Blue Tick: Lama soo akhrin karo (${err.message}).`;
       }
     }
 
-    window.addEventListener("DOMContentLoaded", () => loadVendorProfile("Amiin shop"));
+    window.addEventListener("DOMContentLoaded", () => {
+      loadVendorProfile();
+    });
   </script>
 </body>
 </html>
